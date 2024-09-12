@@ -33,6 +33,7 @@ public final class BlockExplodeListener extends Queue implements Listener {
         HashMap<Location, Block> blockMap = new HashMap<>();
 
         for (Block block : blockList) {
+            if (user.equals("#tnt") && block.getType().toString().contains("_ORE")) continue;
             blockMap.put(block.getLocation(), block);
         }
 
