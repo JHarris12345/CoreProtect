@@ -100,11 +100,6 @@ public final class EntityDeathListener extends Queue implements Listener {
         }
 
         for (LivingEntity entity : entityList) {
-            // We don't want to log entity deaths if it's a stacked mob (saves a LOT of space)
-            if (Bukkit.getServer().getPluginManager().getPlugin("InsanityStacker") != null) {
-                if (PlaceholderAPI.setPlaceholders(null, "%istacker_ismobstacked_" + entity.getUniqueId()).equals("true")) continue;
-            }
-
             Scheduler.runTask(CoreProtect.getInstance(), () -> {
                 if (entity != null && entity.isDead()) {
                     logEntityDeath(entity, "#command");
@@ -135,6 +130,12 @@ public final class EntityDeathListener extends Queue implements Listener {
         if (!Config.getConfig(entity.getWorld()).SKIP_GENERIC_DATA || (!(entity instanceof Zombie) && !(entity instanceof Skeleton)) || (validDamageCauses.contains(cause) || cause.name().equals("KILL"))) {
             skip = false;
         }
+
+        // At the moment this doesn't work as the mob is removed from the stack before this
+        // We don't want to log entity deaths if it's a stacked mob (saves a LOT of space)
+        /*if (Bukkit.getServer().getPluginManager().getPlugin("InsanityStacker") != null) {
+            if (PlaceholderAPI.setPlaceholders(null, "%istacker_ismobstacked_" + entity.getUniqueId() + "%").equals("true")) return;
+        }*/
 
         if (damage instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent attack = (EntityDamageByEntityEvent) damage;
