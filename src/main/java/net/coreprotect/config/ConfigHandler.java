@@ -55,7 +55,6 @@ public class ConfigHandler extends Queue {
     public static String username = "root";
     public static String password = "";
     public static String prefix = "co_";
-    public static String prefixConfig = "co_";
     public static int maximumPoolSize = 10;
 
     public static HikariDataSource hikariDataSource = null;
@@ -66,7 +65,6 @@ public class ConfigHandler extends Queue {
     public static volatile boolean serverRunning = false;
     public static volatile boolean converterRunning = false;
     public static volatile boolean purgeRunning = false;
-    public static volatile boolean migrationRunning = false;
     public static volatile boolean pauseConsumer = false;
     public static volatile boolean worldeditEnabled = false;
     public static volatile boolean databaseReachable = true;
@@ -175,7 +173,6 @@ public class ConfigHandler extends Queue {
 
             // Enforce "co_" table prefix if using SQLite.
             if (!Config.getGlobal().MYSQL) {
-                ConfigHandler.prefixConfig = Config.getGlobal().PREFIX;
                 Config.getGlobal().PREFIX = "co_";
             }
 
@@ -262,7 +259,7 @@ public class ConfigHandler extends Queue {
             ConfigHandler.hikariDataSource = new HikariDataSource(config);
         }
 
-        Database.createDatabaseTables(ConfigHandler.prefix, null, Config.getGlobal().MYSQL, false);
+        Database.createDatabaseTables(ConfigHandler.prefix, false);
     }
 
     public static void loadTypes(Statement statement) {

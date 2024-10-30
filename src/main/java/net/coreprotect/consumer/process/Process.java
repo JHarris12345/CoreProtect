@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 
 import org.bukkit.Material;
 
-import net.coreprotect.config.Config;
 import net.coreprotect.config.ConfigHandler;
 import net.coreprotect.consumer.Consumer;
 import net.coreprotect.database.Database;
@@ -75,7 +74,7 @@ public class Process {
             }
 
             Statement statement = connection.createStatement();
-            Database.performCheckpoint(statement, Config.getGlobal().MYSQL);
+            Database.performCheckpoint(statement);
 
             Consumer.isPaused = true;
             ArrayList<Object[]> consumerData = Consumer.consumer.get(processId);
@@ -92,7 +91,7 @@ public class Process {
                 return;
             }
 
-            Database.beginTransaction(statement, Config.getGlobal().MYSQL);
+            Database.beginTransaction(statement);
             // Scan through usernames, ensure everything is loaded in memory.
             for (Entry<Integer, String[]> entry : users.entrySet()) {
                 String[] data = entry.getValue();
@@ -105,7 +104,7 @@ public class Process {
                 }
             }
             updateLockTable(statement, (lastRun ? 0 : 1));
-            Database.commitTransaction(statement, Config.getGlobal().MYSQL);
+            Database.commitTransaction(statement);
 
             // Create prepared statements
             PreparedStatement preparedStmtSigns = Database.prepareStatement(connection, Database.SIGN, false);
@@ -124,7 +123,7 @@ public class Process {
             PreparedStatement preparedStmtBlockdata = Database.prepareStatement(connection, Database.BLOCKDATA, false);
 
             // Scan through consumer data
-            Database.beginTransaction(statement, Config.getGlobal().MYSQL);
+            Database.beginTransaction(statement);
             for (int i = 0; i < consumerDataSize; i++) {
                 Object[] data = consumerData.get(i);
                 if (data != null) {
@@ -243,7 +242,7 @@ public class Process {
                             if (Consumer.interrupt) {
                                 commit(statement, preparedStmtSigns, preparedStmtBlocks, preparedStmtSkulls, preparedStmtContainers, preparedStmtItems, preparedStmtWorlds, preparedStmtChat, preparedStmtCommand, preparedStmtSession, preparedStmtEntities, preparedStmtMaterials, preparedStmtArt, preparedStmtEntity, preparedStmtBlockdata);
                                 Thread.sleep(500);
-                                Database.beginTransaction(statement, Config.getGlobal().MYSQL);
+                                Database.beginTransaction(statement);
                             }
                         }
                         catch (Exception e) {
@@ -303,7 +302,7 @@ public class Process {
             preparedStmtArt.executeBatch();
             preparedStmtEntity.executeBatch();
             preparedStmtBlockdata.executeBatch();
-            Database.commitTransaction(statement, Config.getGlobal().MYSQL);
+            Database.commitTransaction(statement);
         }
         catch (Exception e) {
             e.printStackTrace();
