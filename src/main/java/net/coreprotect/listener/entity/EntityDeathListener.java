@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -99,6 +100,11 @@ public final class EntityDeathListener extends Queue implements Listener {
         }
 
         for (LivingEntity entity : entityList) {
+            // We don't want to log entity deaths if it's a stacked mob (saves a LOT of space)
+            if (Bukkit.getServer().getPluginManager().getPlugin("InsanityStacker") != null) {
+                if (PlaceholderAPI.setPlaceholders(null, "%istacker_ismobstacked_" + entity.getUniqueId()).equals("true")) continue;
+            }
+
             Scheduler.runTask(CoreProtect.getInstance(), () -> {
                 if (entity != null && entity.isDead()) {
                     logEntityDeath(entity, "#command");

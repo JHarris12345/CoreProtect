@@ -172,5 +172,4 @@ public final class BlockExplodeListener extends Queue implements Listener {
             processBlockExplode(user, world, event.blockList());
         }
     }
-
 }
