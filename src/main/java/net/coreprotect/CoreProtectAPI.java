@@ -70,6 +70,9 @@ public class CoreProtectAPI extends Queue {
             else if (actionID == 3) {
                 result = "kill";
             }
+            else if (actionID == 6) {
+                result = "chat";
+            }
 
             return result;
         }
@@ -485,7 +488,7 @@ public class CoreProtectAPI extends Queue {
             actionList.add(1);
         }
 
-        actionList.removeIf(actionListItem -> actionListItem > 3);
+        //actionList.removeIf(actionListItem -> actionListItem > 3);
 
         if (restrictUsers.size() == 0) {
             restrictUsers.add("#global");
