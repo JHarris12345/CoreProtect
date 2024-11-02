@@ -1,10 +1,6 @@
 package net.coreprotect.listener.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -74,6 +70,8 @@ import net.coreprotect.utility.serialize.ItemMetaHandler;
 
 public final class EntityDeathListener extends Queue implements Listener {
 
+    private List<UUID> stackedMobs = new ArrayList<>(); // A list of mobs that were stacked before getting killed so we DON'T log them
+
     public static void parseEntityKills(String message) {
         message = message.trim().toLowerCase(Locale.ROOT);
         if (!message.contains(" ")) {
@@ -101,7 +99,7 @@ public final class EntityDeathListener extends Queue implements Listener {
 
         for (LivingEntity entity : entityList) {
             Scheduler.runTask(CoreProtect.getInstance(), () -> {
-                if (entity != null && entity.isDead()) {
+                if (entity != null && entity.isDead() && Config.getConfig(entity.getWorld()).ENTITY_KILLS) {
                     logEntityDeath(entity, "#command");
                 }
             }, entity);
@@ -109,10 +107,6 @@ public final class EntityDeathListener extends Queue implements Listener {
     }
 
     protected static void logEntityDeath(LivingEntity entity, String e) {
-        if (!Config.getConfig(entity.getWorld()).ENTITY_KILLS) {
-            return;
-        }
-
         EntityDamageEvent damage = entity.getLastDamageCause();
         if (damage == null) {
             return;
@@ -558,6 +552,29 @@ public final class EntityDeathListener extends Queue implements Listener {
             return;
         }
 
+        if (!Config.getConfig(entity.getWorld()).ENTITY_KILLS) return;
+
+        // We need to check if the mob was stacked because it will never be currently stacked now as the
+        // event in iStacker has already finished and unstacked the mob. If it was stacked, return
+        if (stackedMobs.contains(entity.getUniqueId())) {
+            stackedMobs.remove(entity.getUniqueId());
+            return;
+        }
+
         logEntityDeath(entity, null);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    public void onCheckStacked(EntityDeathEvent e) {
+        if (e.getEntity() instanceof Player) return;
+        if (e.getEntity() instanceof ArmorStand) return;
+        if (!Config.getConfig(e.getEntity().getWorld()).ENTITY_KILLS) return;
+
+        String bool = PlaceholderAPI.setPlaceholders(null, "%istacker_ismobstacked_" + e.getEntity().getUniqueId() + "%");
+        if (bool.equals("true")) {
+            if (!stackedMobs.contains(e.getEntity().getUniqueId())) {
+                stackedMobs.add(e.getEntity().getUniqueId());
+            }
+        }
     }
 }
