@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import net.coreprotect.event.CoreProtectSpawnerRollbackEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -333,6 +334,9 @@ public class Rollback extends RollbackUtil {
                             ArrayList<Object[]> itemData = finalItemList.getOrDefault(chunkKey, new ArrayList<>());
                             Map<Block, BlockData> chunkChanges = new LinkedHashMap<>();
 
+                            // Data for every spawner that is rolled back on the same block here (to account for stacked spawners)
+                            HashMap<String, HashMap<CreatureSpawner, List<Long>>> spawnerLocations = new HashMap<>();
+
                             for (Object[] row : data) {
                                 int unixtimestamp = (int) (System.currentTimeMillis() / 1000L);
                                 int[] rollbackHashData1 = ConfigHandler.rollbackHash.get(finalUserString);
@@ -423,6 +427,7 @@ public class Rollback extends RollbackUtil {
                                         Block block = new Location(bukkitWorld, rowX, rowY, rowZ).getBlock();
                                         if (preview == 2) {
                                             Material blockType = block.getType();
+
                                             if (!BukkitAdapter.ADAPTER.isItemFrame(blockType) && !blockType.equals(Material.PAINTING) && !blockType.equals(Material.ARMOR_STAND) && !blockType.equals(Material.END_CRYSTAL)) {
                                                 Util.prepareTypeAndData(chunkChanges, block, blockType, block.getBlockData(), true);
                                                 blockCount1++;
@@ -559,8 +564,22 @@ public class Rollback extends RollbackUtil {
                                         countBlock = false;
                                     }
 
+                                    // This is the 2nd, 3rd, 4th etc spawners rolled back into the stack when there's already a spawner there
+                                    if (block.getType() == Material.SPAWNER) {
+                                        CreatureSpawner spawner = (CreatureSpawner) block.getState();
+                                        String locationKey = location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ();
+
+                                        HashMap<CreatureSpawner, List<Long>> spawnerData = spawnerLocations.getOrDefault(locationKey, new HashMap<>());
+                                        List<Long> breakTimes = spawnerData.getOrDefault(spawner, new ArrayList<>());
+
+                                        breakTimes.add((long) rowTime);
+                                        spawnerData.put(spawner, breakTimes);
+                                        spawnerLocations.put(locationKey, spawnerData);
+                                    }
+
                                     if ((rowType == pendingChangeType) && ((!BukkitAdapter.ADAPTER.isItemFrame(oldTypeMaterial)) && (oldTypeMaterial != Material.PAINTING) && (oldTypeMaterial != Material.ARMOR_STAND)) && (oldTypeMaterial != Material.END_CRYSTAL)) {
                                         // block is already changed!
+
                                         BlockData checkData = rowType == Material.AIR ? blockData : rawBlockData;
                                         if (checkData != null) {
                                             if (checkData.getAsString().equals(pendingChangeData.getAsString()) || checkData instanceof MultipleFacing || checkData instanceof Stairs || checkData instanceof RedstoneWire) {
@@ -590,6 +609,7 @@ public class Rollback extends RollbackUtil {
 
                                     try {
                                         if (changeBlock) {
+
                                             /* If modifying the head of a piston, update the base piston block to prevent it from being destroyed */
                                             if (changeBlockData instanceof PistonHead) {
                                                 PistonHead pistonHead = (PistonHead) changeBlockData;
@@ -1027,6 +1047,19 @@ public class Rollback extends RollbackUtil {
                                                     blockCount1++;
                                                 }
                                             }
+
+                                            // This is the first spawner rolled back (when there is air or something else there)
+                                            if (block.getType() == Material.SPAWNER) {
+                                                CreatureSpawner spawner = (CreatureSpawner) block.getState();
+                                                String locationKey = location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ();
+
+                                                HashMap<CreatureSpawner, List<Long>> spawnerData = spawnerLocations.getOrDefault(locationKey, new HashMap<>());
+                                                List<Long> breakTimes = spawnerData.getOrDefault(spawner, new ArrayList<>());
+
+                                                breakTimes.add((long) rowTime);
+                                                spawnerData.put(spawner, breakTimes);
+                                                spawnerLocations.put(locationKey, spawnerData);
+                                            }
                                         }
                                     }
                                     catch (Exception e) {
@@ -1044,6 +1077,14 @@ public class Rollback extends RollbackUtil {
                                 ConfigHandler.rollbackHash.put(finalUserString, new int[] { itemCount1, blockCount1, entityCount1, 0, scannedWorlds });
                             }
                             data.clear();
+
+                            if (!spawnerLocations.isEmpty()) {
+                                for (HashMap<CreatureSpawner, List<Long>> spawnerData : spawnerLocations.values()) {
+                                    for (CreatureSpawner spawner : spawnerData.keySet()) {
+                                        new CoreProtectSpawnerRollbackEvent(spawner, 0, spawnerData.get(spawner), startTime).callEvent();
+                                    }
+                                }
+                            }
 
                             // Apply cached changes
                             for (Entry<Block, BlockData> chunkChange : chunkChanges.entrySet()) {
