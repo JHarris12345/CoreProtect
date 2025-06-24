@@ -49,6 +49,9 @@ public class ParseResult {
         else if (actionID == 3) {
             result = "kill";
         }
+        else if (actionID == 6) {
+            result = "chat";
+        }
 
         return result;
     }

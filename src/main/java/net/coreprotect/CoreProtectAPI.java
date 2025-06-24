@@ -760,7 +760,7 @@ public class CoreProtectAPI extends Queue {
             actionList.add(1);
         }
 
-        actionList.removeIf(actionListItem -> actionListItem > 3);
+        //actionList.removeIf(actionListItem -> actionListItem > 3);
 
         if (restrictUsers.isEmpty()) {
             restrictUsers.add("#global");

@@ -58,7 +58,7 @@ public class __2_18_0 {
                 PreparedStatement preparedContainerStatement = statement.getConnection().prepareStatement(preparedContainerQuery);
                 PreparedStatement preparedContainerUpdateStatement = statement.getConnection().prepareStatement(preparedContainerUpdateQuery);
                 PreparedStatement preparedMaterialDeleteStatement = statement.getConnection().prepareStatement(preparedMaterialDeleteQuery);
-                Database.beginTransaction(statement);
+                Database.beginTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
                 try {
                     ResultSet resultSet = statement.executeQuery(query);
                     while (resultSet.next()) {
@@ -164,7 +164,7 @@ public class __2_18_0 {
                 catch (Exception e) {
                     e.printStackTrace();
                 }
-                Database.commitTransaction(statement);
+                Database.commitTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
 
                 preparedBlockStatement.close();
                 preparedBlockUpdateStatement.close();
