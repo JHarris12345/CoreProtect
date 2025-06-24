@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
@@ -35,6 +36,7 @@ import org.bukkit.entity.Panda;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Pig;
+import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.Sheep;
@@ -46,6 +48,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.Zoglin;
 import org.bukkit.entity.Zombie;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.EventHandler;
@@ -60,6 +63,8 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.projectiles.ProjectileSource;
+
+import com.google.common.collect.Lists;
 
 import net.coreprotect.CoreProtect;
 import net.coreprotect.bukkit.BukkitAdapter;
@@ -115,6 +120,10 @@ public final class EntityDeathListener extends Queue implements Listener {
         boolean isCommand = (damage.getCause() == DamageCause.VOID && entity.getLocation().getBlockY() >= BukkitAdapter.ADAPTER.getMinHeight(entity.getWorld()));
         if (e == null) {
             e = isCommand ? "#command" : "";
+        }
+
+        if (entity.getType().name().equals("GLOW_SQUID") && damage.getCause() == DamageCause.DROWNING) {
+            return;
         }
 
         List<DamageCause> validDamageCauses = Arrays.asList(DamageCause.SUICIDE, DamageCause.POISON, DamageCause.THORNS, DamageCause.MAGIC, DamageCause.WITHER);
@@ -284,13 +293,12 @@ public final class EntityDeathListener extends Queue implements Listener {
 
             if (entity instanceof Attributable) {
                 Attributable attributable = entity;
-
-                for (Attribute attribute : Attribute.values()) {
+                for (Attribute attribute : Lists.newArrayList(Registry.ATTRIBUTE)) {
                     AttributeInstance attributeInstance = attributable.getAttribute(attribute);
                     if (attributeInstance != null) {
                         List<Object> attributeData = new ArrayList<>();
                         List<Object> attributeModifiers = new ArrayList<>();
-                        attributeData.add(attributeInstance.getAttribute());
+                        attributeData.add(BukkitAdapter.ADAPTER.getRegistryKey(attributeInstance.getAttribute()));
                         attributeData.add(attributeInstance.getBaseValue());
 
                         for (AttributeModifier modifier : attributeInstance.getModifiers()) {
@@ -325,6 +333,7 @@ public final class EntityDeathListener extends Queue implements Listener {
                 Cat cat = (Cat) entity;
                 info.add(BukkitAdapter.ADAPTER.getRegistryKey(cat.getCatType()));
                 info.add(cat.getCollarColor());
+                info.add(cat.isSitting());
             }
             else if (entity instanceof Fox) {
                 Fox fox = (Fox) entity;
@@ -430,6 +439,7 @@ public final class EntityDeathListener extends Queue implements Listener {
                 Wolf wolf = (Wolf) entity;
                 info.add(wolf.isSitting());
                 info.add(wolf.getCollarColor());
+                BukkitAdapter.ADAPTER.getWolfVariant(wolf, info);
             }
             else if (entity instanceof ZombieVillager) {
                 ZombieVillager zombieVillager = (ZombieVillager) entity;
@@ -508,11 +518,19 @@ public final class EntityDeathListener extends Queue implements Listener {
                     }
                 }
             }
-            if (entity instanceof Bee) {
+            else if (entity instanceof Bee) {
                 Bee bee = (Bee) entity;
                 info.add(bee.getAnger());
                 info.add(bee.hasNectar());
                 info.add(bee.hasStung());
+            }
+            else if (entity instanceof Piglin) {
+                Piglin piglin = (Piglin) entity;
+                info.add(piglin.isBaby());
+            }
+            else if (entity instanceof Zoglin) {
+                Zoglin zoglin = (Zoglin) entity;
+                info.add(zoglin.isBaby());
             }
             else {
                 BukkitAdapter.ADAPTER.getEntityMeta(entity, info);
