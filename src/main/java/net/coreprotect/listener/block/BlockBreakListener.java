@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import net.coreprotect.CoreProtect;
 import org.bukkit.*;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
@@ -40,6 +41,16 @@ import net.coreprotect.paper.PaperAdapter;
 import net.coreprotect.utility.BlockUtils;
 
 public final class BlockBreakListener extends Queue implements Listener {
+
+    public BlockBreakListener() {
+        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath() + "/server-info.yml");
+        if (file.exists()) {
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+            String serverName = config.getString("ServerName");
+
+            if (serverName != null && serverName.equals("Skyblock")) CoreProtect.isSkyblock = true;
+        }
+    }
 
     private static boolean isAttached(Block block, Block scanBlock, int scanMin) {
         BlockData blockData = scanBlock.getBlockData();
@@ -102,15 +113,7 @@ public final class BlockBreakListener extends Queue implements Listener {
         locationMap[5] = new Location(world, x, y - 1, z);
 
         // Don't log ore breaks on Skyblock
-        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath() + "/server-info.yml");
-        if (file.exists()) {
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-            String serverName = config.getString("ServerName");
-
-            if (serverName != null && serverName.equals("Skyblock")) {
-                if (block.getType().toString().endsWith("_ORE")) return;
-            }
-        }
+        if (CoreProtect.isSkyblock && block.getType().toString().endsWith("_ORE")) return;
 
         int scanMin = 1;
         int scanMax = 8;

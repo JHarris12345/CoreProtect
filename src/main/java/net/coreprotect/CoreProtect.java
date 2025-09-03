@@ -17,6 +17,7 @@ public final class CoreProtect extends JavaPlugin {
 
     private static CoreProtect instance;
     private boolean advancedChestsEnabled = false;
+    public static boolean isSkyblock; // If this is true, we won't log ore block breaks
 
     /**
      * Get the instance of CoreProtect
