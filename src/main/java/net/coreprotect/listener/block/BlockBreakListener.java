@@ -1,13 +1,11 @@
 package net.coreprotect.listener.block;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -24,6 +22,7 @@ import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Bell;
 import org.bukkit.block.data.type.Lantern;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -101,6 +100,17 @@ public final class BlockBreakListener extends Queue implements Listener {
         locationMap[3] = new Location(world, x, y, z - 1);
         locationMap[4] = new Location(world, x, y + 1, z);
         locationMap[5] = new Location(world, x, y - 1, z);
+
+        // Don't log ore breaks on Skyblock
+        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath() + "/server-info.yml");
+        if (file.exists()) {
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+            String serverName = config.getString("ServerName");
+
+            if (serverName != null && serverName.equals("Skyblock")) {
+                if (block.getType().toString().endsWith("_ORE")) return;
+            }
+        }
 
         int scanMin = 1;
         int scanMax = 8;
