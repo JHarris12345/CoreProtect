@@ -131,6 +131,7 @@
                     <allowedRepository>paper-repo</allowedRepository>
                     <allowedRepository>codemc-repo</allowedRepository>
                     <allowedRepository>jitpack.io</allowedRepository>
+                    <allowedRepository>placeholderapi</allowedRepository>
                   </allowedRepositories>
                 </requireNoRepositories>
               </rules>
