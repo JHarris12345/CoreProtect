@@ -105,11 +105,14 @@ public class Queue {
 
     protected static void queueBlockBreak(String user, BlockState block, Material type, String blockData, Material breakType, int extraData, int blockNumber) {
         String spawnerStack = null;
+
         if (type == Material.SPAWNER && block instanceof CreatureSpawner) { // Mob spawner
             CreatureSpawner mobSpawner = (CreatureSpawner) block;
             extraData = EntityUtils.getSpawnerType(mobSpawner.getSpawnedType());
 
-            // Read PDC immediately while still on the main thread, before async consumer processes it
+            // Read PDC immediately as a String before the async consumer processes it,
+            // since the BlockState snapshot's PDC may share a reference with the world
+            // tile entity and can be modified by other plugins before the consumer runs
             Plugin iFacs = Bukkit.getPluginManager().getPlugin("InsanityFactions");
             if (iFacs != null) {
                 spawnerStack = mobSpawner.getPersistentDataContainer().get(new NamespacedKey(iFacs, "spawnerStack"), PersistentDataType.STRING);

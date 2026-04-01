@@ -260,18 +260,6 @@ public class BlockUtils {
                 if (spawnerStack != null) {
                     meta.add(spawnerStack);
                 }
-                else {
-                    Plugin iFacs = Bukkit.getPluginManager().getPlugin("InsanityFactions");
-
-                    if (iFacs != null) {
-                        CreatureSpawner spawner = (CreatureSpawner) block;
-                        String stack = spawner.getPersistentDataContainer().get(new NamespacedKey(iFacs, "spawnerStack"), PersistentDataType.STRING);
-
-                        if (stack != null) {
-                            meta.add(stack);
-                        }
-                    }
-                }
             }
         }
         catch (Exception e) {
