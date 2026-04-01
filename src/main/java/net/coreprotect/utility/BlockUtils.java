@@ -224,10 +224,6 @@ public class BlockUtils {
         return inventory;
     }
 
-    public static List<Object> processMeta(BlockState block) {
-        return processMeta(block, null);
-    }
-
     public static List<Object> processMeta(BlockState block, String spawnerStack) {
         List<Object> meta = new ArrayList<>();
         try {
@@ -263,21 +259,23 @@ public class BlockUtils {
             else if (block instanceof CreatureSpawner) {
                 // Use pre-captured spawnerStack if available (captured eagerly on main thread),
                 // otherwise fall back to reading from BlockState snapshot
-                if (spawnerStack != null) {
+                /*if (spawnerStack != null) {
+                    System.out.println("getting " + spawnerStack);
                     meta.add(spawnerStack);
                 }
-                else {
+                else {*/
                     Plugin iFacs = Bukkit.getPluginManager().getPlugin("InsanityFactions");
 
                     if (iFacs != null) {
                         CreatureSpawner spawner = (CreatureSpawner) block;
                         String stack = spawner.getPersistentDataContainer().get(new NamespacedKey(iFacs, "spawnerStack"), PersistentDataType.STRING);
 
+                        System.out.println("got " + stack);
                         if (stack != null) {
                             meta.add(stack);
                         }
                     }
-                }
+                //}
             }
         }
         catch (Exception e) {
