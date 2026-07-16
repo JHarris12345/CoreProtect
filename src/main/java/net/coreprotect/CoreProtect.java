@@ -2,6 +2,7 @@ package net.coreprotect;
 
 import java.io.File;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.coreprotect.config.ConfigHandler;
@@ -45,7 +46,6 @@ public final class CoreProtect extends JavaPlugin {
         instance = this;
         ConfigHandler.path = this.getDataFolder().getPath() + File.separator;
 
-        advancedChestsEnabled = getServer().getPluginManager().getPlugin("AdvancedChests") != null;
         // Initialize plugin using the initialization service
         boolean initialized = PluginInitializationService.initializePlugin(this);
 
@@ -62,6 +62,7 @@ public final class CoreProtect extends JavaPlugin {
     }
 
     public boolean isAdvancedChestsEnabled() {
-        return advancedChestsEnabled;
+        Plugin advancedChests = getServer().getPluginManager().getPlugin("AdvancedChests");
+        return advancedChests != null && advancedChests.isEnabled();
     }
 }

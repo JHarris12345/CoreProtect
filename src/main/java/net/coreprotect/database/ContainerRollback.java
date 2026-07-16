@@ -15,6 +15,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.coreprotect.CoreProtect;
@@ -24,12 +25,14 @@ import net.coreprotect.consumer.process.Process;
 import net.coreprotect.database.rollback.Rollback;
 import net.coreprotect.database.rollback.RollbackComplete;
 import net.coreprotect.language.Phrase;
+import net.coreprotect.listener.player.InventoryChangeListener;
 import net.coreprotect.model.BlockGroup;
 import net.coreprotect.thread.Scheduler;
 import net.coreprotect.utility.BlockUtils;
 import net.coreprotect.utility.Chat;
 import net.coreprotect.utility.ItemUtils;
 import net.coreprotect.utility.MaterialUtils;
+import net.coreprotect.utility.ErrorReporter;
 
 public class ContainerRollback extends Rollback {
 
@@ -90,6 +93,9 @@ public class ContainerRollback extends Rollback {
 
                         int modifyCount = 0;
                         if (container != null) {
+                            if (container instanceof Inventory) {
+                                InventoryChangeListener.flushPendingContainer((Inventory) container, location);
+                            }
                             for (Object[] lookupRow : lookupList) {
                                 // int unixtimestamp = (int) (System.currentTimeMillis() / 1000L);
                                 // int rowId = lookupRow[0];
@@ -147,7 +153,7 @@ public class ContainerRollback extends Rollback {
                         ConfigHandler.rollbackHash.put(finalUserString, new int[] { itemCount, modifyCount, entityCount, 1, 1 });
                     }
                     catch (Exception e) {
-                        e.printStackTrace();
+                        ErrorReporter.report(e);
                     }
                 }
             }, location, 0);
@@ -184,7 +190,7 @@ public class ContainerRollback extends Rollback {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            ErrorReporter.report(e);
         }
     }
 
