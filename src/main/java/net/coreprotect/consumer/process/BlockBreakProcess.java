@@ -18,12 +18,17 @@ class BlockBreakProcess {
         if (object instanceof BlockState) {
             BlockState block = (BlockState) object;
 <<<<<<< HEAD
+<<<<<<< HEAD
             List<Object> meta = BlockUtils.processMeta(block, spawnerStack);
             if (block instanceof Skull) {
 =======
             List<Object> meta = BlockUtils.processMeta(block);
             if (block instanceof Skull && blockType != null && blockType.equals(block.getType())) {
 >>>>>>> master
+=======
+            List<Object> meta = BlockUtils.processMeta(block, spawnerStack);
+            if (block instanceof Skull && blockType != null && blockType.equals(block.getType())) {
+>>>>>>> origin/jh-master
                 SkullBreakLogger.log(preparedStmt, preparedStmtSkulls, batchCount, user, block);
             }
             else {

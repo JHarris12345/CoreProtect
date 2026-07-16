@@ -1035,10 +1035,13 @@ public class CoreProtectAPI extends Queue {
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         //actionList.removeIf(actionListItem -> actionListItem > 3);
 
 =======
 >>>>>>> master
+=======
+>>>>>>> origin/jh-master
         if (restrictUsers.isEmpty()) {
             restrictUsers.add("#global");
         }

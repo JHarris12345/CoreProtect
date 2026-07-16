@@ -32,10 +32,20 @@ public class ParseResult implements CoreProtectResult {
     public String getActionString() {
         int actionID = Integer.parseInt(parse[7]);
         if (parse.length < 13 && Integer.parseInt(parse[6]) == SessionLookup.ID) {
-            return SessionActions.getActionString(actionID);
+            switch (actionID) {
+                case 0:
+                    return "logout";
+                case 1:
+                    return "login";
+                default:
+                    return "unknown";
+            }
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/jh-master
         String result = "unknown";
         if (actionID == 0) {
             result = "break";
@@ -54,9 +64,12 @@ public class ParseResult implements CoreProtectResult {
         }
 
         return result;
+<<<<<<< HEAD
 =======
         return LookupActions.getActionString(actionID);
 >>>>>>> master
+=======
+>>>>>>> origin/jh-master
     }
 
     @Deprecated

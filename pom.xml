@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.coreprotect</groupId>
     <artifactId>CoreProtect</artifactId>
@@ -16,6 +17,8 @@
             <resource>
                 <directory>src/main/java</directory>
 =======
+=======
+>>>>>>> origin/jh-master
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.coreprotect</groupId>
   <artifactId>CoreProtect</artifactId>
@@ -98,10 +101,19 @@
                 </filter>
               </filters>
               <artifactSet>
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> origin/jh-master
                 <excludes>
-                    <exclude>**/*.java</exclude>
+                  <exclude>com.google.code.gson:*</exclude>
+                  <exclude>org.intellij:*</exclude>
+                  <exclude>org.jetbrains:*</exclude>
+                  <exclude>org.slf4j:*</exclude>
+                  <exclude>org.apache.logging.log4j:*</exclude>
+                  <exclude>net.java.dev.jna:*</exclude>
                 </excludes>
+<<<<<<< HEAD
 <<<<<<< HEAD
             </resource>
             <resource>
@@ -114,6 +126,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
 =======
+=======
+>>>>>>> origin/jh-master
               </artifactSet>
               <relocations>
                 <relocation>
@@ -158,6 +172,7 @@
                     <allowedRepository>paper-repo</allowedRepository>
                     <allowedRepository>codemc-repo</allowedRepository>
                     <allowedRepository>jitpack.io</allowedRepository>
+                    <allowedRepository>placeholderapi</allowedRepository>
                   </allowedRepositories>
                 </requireNoRepositories>
               </rules>
@@ -184,121 +199,27 @@
               <execution>
                 <id>install-validation</id>
                 <phase>install</phase>
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> origin/jh-master
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                  <target>
+                    <delete>
+                      <fileset dir="${project.build.directory}">
+                        <include name="${project.build.finalName}-shaded.jar"/>
+                      </fileset>
+                    </delete>
+                  </target>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipTests}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*:*:*</artifact>
-                                    <excludes>
-                                        <exclude>**/*.java</exclude>
-                                        <exclude>**/*.c</exclude>
-                                        <exclude>META-INF/maven/**/pom.properties</exclude>
-                                        <exclude>META-INF/services/**</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>com.google.code.gson:*</exclude>
-                                    <exclude>org.intellij:*</exclude>
-                                    <exclude>org.jetbrains:*</exclude>
-                                    <exclude>org.slf4j:*</exclude>
-                                    <exclude>org.apache.logging.log4j:*</exclude>
-                                    <exclude>net.java.dev.jna:*</exclude>
-                                </excludes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>net.coreprotect</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.zaxxer</pattern>
-                                    <shadedPattern>net.coreprotect</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <plugin.version>${project.version}</plugin.version>
-                    </systemPropertyVariables>
-                    <skipTests>${skipTests}</skipTests>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.1</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals><goal>enforce</goal></goals>
-                        <configuration>
-                            <rules>
-                                <requireNoRepositories>
-                                    <allowedRepositories>
-                                        <allowedRepository>central</allowedRepository>
-                                        <allowedRepository>enginehub-repo</allowedRepository>
-                                        <allowedRepository>spigot-repo</allowedRepository>
-                                        <allowedRepository>paper-repo</allowedRepository>
-                                        <allowedRepository>codemc-repo</allowedRepository>
-                                        <allowedRepository>jitpack.io</allowedRepository>
-                                        <allowedRepository>placeholderapi</allowedRepository>
-                                        <allowedRepository>papermc</allowedRepository>
-                                    </allowedRepositories>
-                                </requireNoRepositories>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
+<<<<<<< HEAD
 <<<<<<< HEAD
     </build>
     <profiles>
@@ -503,6 +424,8 @@
         </dependency>
     </dependencies>
 =======
+=======
+>>>>>>> origin/jh-master
       </build>
     </profile>
   </profiles>
@@ -534,6 +457,10 @@
     <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>placeholderapi</id>
+      <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -655,6 +582,15 @@
       <version>1.18.8</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>me.clip</groupId>
+      <artifactId>placeholderapi</artifactId>
+      <version>2.11.6</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> origin/jh-master
 </project>

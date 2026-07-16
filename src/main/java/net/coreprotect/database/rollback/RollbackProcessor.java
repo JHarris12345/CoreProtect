@@ -221,16 +221,23 @@ public class RollbackProcessor {
                     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/jh-master
                     ArrayList<Object> metaValue = (meta != null ? new ArrayList<>(meta) : null);
                     Bukkit.getServer().getPluginManager().callEvent(new PreRollbackBlockEvent(block, rollbackType, metaValue)); // Calls for any potential block
 
-                    if (RollbackBlockHandler.processBlockChange(bukkitWorld, block, row, rollbackType, clearInventories, chunkChanges, countBlock, oldTypeMaterial, pendingChangeType, pendingChangeData, finalUserString, rawBlockData, changeType, changeBlock, changeBlockData, metaValue, blockData, rowUser, rowType, rowX, rowY, rowZ, rowTypeRaw, rowData, rowAction, rowWorldId, BlockUtils.byteDataToString((byte[]) row[13], rowTypeRaw)) && countBlock) {
+                    if (RollbackBlockHandler.processBlockChange(bukkitRollbackWorld, block, row, rollbackType, clearInventories, chunkChanges, countBlock, oldTypeMaterial, pendingChangeType, pendingChangeData, counters, rawBlockData, changeType, changeBlock, changeBlockData, metaValue, blockData, rowUser, rowType, rowX, rowY, rowZ, rowTypeRaw, rowData, rowAction, rowWorldId, BlockUtils.byteDataToString((byte[]) row[13], rowTypeRaw)) && countBlock) {
                         Bukkit.getServer().getPluginManager().callEvent(new PostRollbackBlockEvent(block, rollbackType, metaValue)); // Calls only if the block was updated due to a successful rollback
+<<<<<<< HEAD
                         blockCount++;
 =======
                     if (RollbackBlockHandler.processBlockChange(bukkitRollbackWorld, block, row, rollbackType, clearInventories, chunkChanges, countBlock, oldTypeMaterial, pendingChangeType, pendingChangeData, counters, rawBlockData, changeType, changeBlock, changeBlockData, meta != null ? new ArrayList<>(meta) : null, blockData, rowUser, rowType, rowX, rowY, rowZ, rowTypeRaw, rowData, rowAction, rowWorldId, BlockUtils.byteDataToString((byte[]) row[13], rowTypeRaw)) && countBlock) {
                         counters.addBlocks(1);
 >>>>>>> master
+=======
+                        counters.addBlocks(1);
+>>>>>>> origin/jh-master
                     }
                 }
             }
