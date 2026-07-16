@@ -51,6 +51,7 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zoglin;
 import org.bukkit.entity.Zombie;
 import org.bukkit.entity.ZombieVillager;
+import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -70,12 +71,28 @@ import net.coreprotect.CoreProtect;
 import net.coreprotect.bukkit.BukkitAdapter;
 import net.coreprotect.config.Config;
 import net.coreprotect.consumer.Queue;
+import net.coreprotect.paper.PaperAdapter;
+import net.coreprotect.spigot.SpigotAdapter;
+import net.coreprotect.thread.CacheHandler;
 import net.coreprotect.thread.Scheduler;
 import net.coreprotect.utility.serialize.ItemMetaHandler;
+import net.coreprotect.utility.EntitySpawnTracking;
 
 public final class EntityDeathListener extends Queue implements Listener {
 
+<<<<<<< HEAD
     private List<UUID> stackedMobs = new ArrayList<>(); // A list of mobs that were stacked before getting killed so we DON'T log them
+=======
+    private static final int ENTITY_KILL_DUPLICATE_THRESHOLD = 256;
+    private static final int ENTITY_KILL_DUPLICATE_WINDOW_SECONDS = 900;
+    private static final MemoryKey<?>[] VILLAGER_MEMORY_KEYS = {
+        MemoryKey.JOB_SITE,
+        MemoryKey.POTENTIAL_JOB_SITE,
+        MemoryKey.HOME,
+        MemoryKey.MEETING_POINT,
+        MemoryKey.LAST_WORKED_AT_POI
+    };
+>>>>>>> master
 
     public static void parseEntityKills(String message) {
         message = message.trim().toLowerCase(Locale.ROOT);
@@ -113,24 +130,24 @@ public final class EntityDeathListener extends Queue implements Listener {
 
     protected static void logEntityDeath(LivingEntity entity, String e) {
         EntityDamageEvent damage = entity.getLastDamageCause();
-        if (damage == null) {
+        if (damage == null && e == null) {
             return;
         }
 
-        boolean isCommand = (damage.getCause() == DamageCause.VOID && entity.getLocation().getBlockY() >= BukkitAdapter.ADAPTER.getMinHeight(entity.getWorld()));
+        EntityDamageEvent.DamageCause cause = damage == null ? null : damage.getCause();
+        boolean isCommand = (cause == DamageCause.VOID && entity.getLocation().getBlockY() >= BukkitAdapter.ADAPTER.getMinHeight(entity.getWorld()));
         if (e == null) {
             e = isCommand ? "#command" : "";
         }
 
-        if (entity.getType().name().equals("GLOW_SQUID") && damage.getCause() == DamageCause.DROWNING) {
+        if (entity.getType().name().equals("GLOW_SQUID") && cause == DamageCause.DROWNING) {
             return;
         }
 
         List<DamageCause> validDamageCauses = Arrays.asList(DamageCause.SUICIDE, DamageCause.POISON, DamageCause.THORNS, DamageCause.MAGIC, DamageCause.WITHER);
 
         boolean skip = true;
-        EntityDamageEvent.DamageCause cause = damage.getCause();
-        if (!Config.getConfig(entity.getWorld()).SKIP_GENERIC_DATA || (!(entity instanceof Zombie) && !(entity instanceof Skeleton)) || (validDamageCauses.contains(cause) || cause.name().equals("KILL"))) {
+        if (cause != null && (!Config.getConfig(entity.getWorld()).SKIP_GENERIC_DATA || (!(entity instanceof Zombie) && !(entity instanceof Skeleton)) || (validDamageCauses.contains(cause) || cause.name().equals("KILL")))) {
             skip = false;
         }
 
@@ -178,7 +195,7 @@ public final class EntityDeathListener extends Queue implements Listener {
                 e = "#" + attacker.getType().name().toLowerCase(Locale.ROOT);
             }
         }
-        else {
+        else if (cause != null) {
             if (cause.equals(EntityDamageEvent.DamageCause.FIRE)) {
                 e = "#fire";
             }
@@ -251,6 +268,10 @@ public final class EntityDeathListener extends Queue implements Listener {
 
         if (e.startsWith("#lightning")) {
             e = "#lightning";
+        }
+
+        if (Config.getConfig(entity.getWorld()).DUPLICATE_SUPPRESSION && shouldSuppressEntityKill(e, entity, cause)) {
+            return;
         }
 
         if (e.length() > 0) {
@@ -403,6 +424,8 @@ public final class EntityDeathListener extends Queue implements Listener {
                     recipe.add(ingredients);
                     recipe.add(merchantRecipe.getVillagerExperience());
                     recipe.add(merchantRecipe.getPriceMultiplier());
+                    BukkitAdapter.ADAPTER.addMerchantRecipeMeta(merchantRecipe, recipe);
+                    PaperAdapter.ADAPTER.addMerchantRecipeMeta(merchantRecipe, recipe);
                     recipes.add(recipe);
                 }
 
@@ -413,6 +436,10 @@ public final class EntityDeathListener extends Queue implements Listener {
                     info.add(recipes);
                     info.add(villager.getVillagerLevel());
                     info.add(villager.getVillagerExperience());
+                    info.add(serializeVillagerMemories(villager));
+                    info.add(PaperAdapter.ADAPTER.getVillagerReputations(villager));
+                    info.add(PaperAdapter.ADAPTER.getVillagerRestocksToday(villager));
+                    info.add(SpigotAdapter.ADAPTER.getVillagerGossipDecayTime(villager));
                 }
                 else {
                     info.add(null);
@@ -537,6 +564,9 @@ public final class EntityDeathListener extends Queue implements Listener {
             data.add(entity.getCustomName());
             data.add(attributes);
             data.add(details);
+            if (EntitySpawnTracking.isTracked(entity)) {
+                data.add(entity.getUniqueId().toString());
+            }
 
             if (!(entity instanceof Player)) {
                 Queue.queueEntityKill(e, entity.getLocation(), data, type);
@@ -545,6 +575,54 @@ public final class EntityDeathListener extends Queue implements Listener {
                 Queue.queuePlayerKill(e, entity.getLocation(), entity.getName());
             }
         }
+    }
+
+    private static List<Object> serializeVillagerMemories(Villager villager) {
+        List<Object> memories = new ArrayList<>();
+        for (MemoryKey<?> key : VILLAGER_MEMORY_KEYS) {
+            addVillagerMemory(villager, memories, key);
+        }
+
+        return memories;
+    }
+
+    private static <T> void addVillagerMemory(Villager villager, List<Object> memories, MemoryKey<T> key) {
+        T value = villager.getMemory(key);
+        if (value == null) {
+            return;
+        }
+
+        List<Object> memory = new ArrayList<>();
+        memory.add(key.getKey().toString());
+        if (value instanceof Location) {
+            memory.add(serializeMemoryLocation((Location) value));
+        }
+        else {
+            memory.add(value);
+        }
+        memories.add(memory);
+    }
+
+    private static List<Object> serializeMemoryLocation(Location location) {
+        List<Object> data = new ArrayList<>();
+        World world = location.getWorld();
+        data.add(world == null ? "" : world.getName());
+        data.add(location.getBlockX());
+        data.add(location.getBlockY());
+        data.add(location.getBlockZ());
+        return data;
+    }
+
+    private static boolean shouldSuppressEntityKill(String user, LivingEntity entity, DamageCause cause) {
+        if (user == null || !user.startsWith("#") || "#command".equals(user)) {
+            return false;
+        }
+
+        Location location = entity.getLocation();
+        String causeName = cause == null ? "UNKNOWN" : cause.name();
+        String customName = entity.getCustomName();
+        String signature = location.getWorld().getUID().toString() + "." + location.getBlockX() + "." + location.getBlockY() + "." + location.getBlockZ() + "." + user + "." + entity.getType().name() + "." + causeName + "." + (customName == null ? "-" : customName);
+        return CacheHandler.shouldSuppressRepeat(CacheHandler.entityKillDuplicateCache, signature, ENTITY_KILL_DUPLICATE_THRESHOLD, ENTITY_KILL_DUPLICATE_WINDOW_SECONDS);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -564,6 +642,7 @@ public final class EntityDeathListener extends Queue implements Listener {
             return;
         }
 
+<<<<<<< HEAD
         if (!Config.getConfig(entity.getWorld()).ENTITY_KILLS) return;
 
         // We need to check if the mob was stacked because it will never be currently stacked now as the
@@ -571,6 +650,11 @@ public final class EntityDeathListener extends Queue implements Listener {
         if (stackedMobs.contains(entity.getUniqueId())) {
             stackedMobs.remove(entity.getUniqueId());
             return;
+=======
+        if (EntitySpawnTracking.isTracked(entity)) {
+            Queue.queueEntitySpawnRemoved(entity.getUniqueId(), entity.getLocation());
+            EntitySpawnTracking.forget(entity.getUniqueId());
+>>>>>>> master
         }
 
         logEntityDeath(entity, null);

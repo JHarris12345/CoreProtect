@@ -2,6 +2,7 @@ package net.coreprotect;
 
 import java.io.File;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.coreprotect.config.ConfigHandler;
@@ -16,9 +17,12 @@ import net.coreprotect.utility.Chat;
 public final class CoreProtect extends JavaPlugin {
 
     private static CoreProtect instance;
+<<<<<<< HEAD
     private boolean advancedChestsEnabled = false;
     public static boolean isSkyblock; // If this is true, we won't log ore block breaks
 
+=======
+>>>>>>> master
     /**
      * Get the instance of CoreProtect
      *
@@ -45,7 +49,6 @@ public final class CoreProtect extends JavaPlugin {
         instance = this;
         ConfigHandler.path = this.getDataFolder().getPath() + File.separator;
 
-        advancedChestsEnabled = getServer().getPluginManager().getPlugin("AdvancedChests") != null;
         // Initialize plugin using the initialization service
         boolean initialized = PluginInitializationService.initializePlugin(this);
 
@@ -62,6 +65,7 @@ public final class CoreProtect extends JavaPlugin {
     }
 
     public boolean isAdvancedChestsEnabled() {
-        return advancedChestsEnabled;
+        Plugin advancedChests = getServer().getPluginManager().getPlugin("AdvancedChests");
+        return advancedChests != null && advancedChests.isEnabled();
     }
 }
