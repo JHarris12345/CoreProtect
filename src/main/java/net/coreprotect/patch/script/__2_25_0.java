@@ -14,6 +14,14 @@ public class __2_25_0 {
 
     private static final int MYSQL_DUPLICATE_KEY_NAME = 1061;
 
+    protected static boolean patchClickHouse(Statement statement) {
+        return true;
+    }
+
+    protected static boolean patchDuckDB(Statement statement) {
+        return true;
+    }
+
     protected static boolean patch(Statement statement) {
         if (Config.getGlobal().MYSQL) {
             if (!createEntityInteractionTable(statement)
@@ -106,8 +114,11 @@ public class __2_25_0 {
     private static boolean widenMySQLEntityData(Statement statement, String table) {
         try {
             try (ResultSet resultSet = statement.executeQuery("SHOW COLUMNS FROM " + table + " LIKE 'data'")) {
-                if (resultSet.next() && "mediumblob".equalsIgnoreCase(resultSet.getString("Type"))) {
-                    return true;
+                if (resultSet.next()) {
+                    String type = resultSet.getString("Type");
+                    if ("mediumblob".equalsIgnoreCase(type) || "longblob".equalsIgnoreCase(type)) {
+                        return true;
+                    }
                 }
             }
 

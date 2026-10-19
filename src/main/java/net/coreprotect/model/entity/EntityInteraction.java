@@ -15,13 +15,19 @@ public final class EntityInteraction {
     private final Location currentLocation;
     private final EntityInteractionAction action;
     private final byte[] metadata;
+    private final int time;
     private final int identityResolutionAttempts;
+    private final boolean identityPromotion;
 
     public EntityInteraction(UUID entityUuid, EntityType entityType, EntityInteractionOrigin origin, Location currentLocation, EntityInteractionAction action, byte[] metadata) {
-        this(entityUuid, entityType, origin, currentLocation, action, metadata, 0);
+        this(entityUuid, entityType, origin, currentLocation, action, metadata, (int) (System.currentTimeMillis() / 1000L));
     }
 
-    private EntityInteraction(UUID entityUuid, EntityType entityType, EntityInteractionOrigin origin, Location currentLocation, EntityInteractionAction action, byte[] metadata, int identityResolutionAttempts) {
+    public EntityInteraction(UUID entityUuid, EntityType entityType, EntityInteractionOrigin origin, Location currentLocation, EntityInteractionAction action, byte[] metadata, int time) {
+        this(entityUuid, entityType, origin, currentLocation, action, metadata, time, 0, false);
+    }
+
+    private EntityInteraction(UUID entityUuid, EntityType entityType, EntityInteractionOrigin origin, Location currentLocation, EntityInteractionAction action, byte[] metadata, int time, int identityResolutionAttempts, boolean identityPromotion) {
         if (entityUuid == null || entityType == null || origin == null || currentLocation == null || currentLocation.getWorld() == null || action == null) {
             throw new IllegalArgumentException("Invalid entity interaction");
         }
@@ -31,7 +37,9 @@ public final class EntityInteraction {
         this.currentLocation = currentLocation.clone();
         this.action = action;
         this.metadata = metadata == null ? null : metadata.clone();
+        this.time = time;
         this.identityResolutionAttempts = identityResolutionAttempts;
+        this.identityPromotion = identityPromotion;
     }
 
     public UUID getEntityUuid() {
@@ -58,11 +66,33 @@ public final class EntityInteraction {
         return metadata == null ? null : metadata.clone();
     }
 
+    public int getTime() {
+        return time;
+    }
+
+    public boolean hasIdentityPromotion() {
+        return identityPromotion;
+    }
+
+    public EntityInteraction withAction(EntityInteractionAction action) {
+        if (this.action == action) {
+            return this;
+        }
+        return new EntityInteraction(entityUuid, entityType, origin, currentLocation, action, metadata, time, identityResolutionAttempts, identityPromotion);
+    }
+
+    public EntityInteraction withIdentityPromotion(boolean promotion) {
+        if (identityPromotion == promotion) {
+            return this;
+        }
+        return new EntityInteraction(entityUuid, entityType, origin, currentLocation, action, metadata, time, identityResolutionAttempts, promotion);
+    }
+
     public EntityInteraction retry() {
         if (!canRetry()) {
             return null;
         }
-        return new EntityInteraction(entityUuid, entityType, origin, currentLocation, action, metadata, identityResolutionAttempts + 1);
+        return new EntityInteraction(entityUuid, entityType, origin, currentLocation, action, metadata, time, identityResolutionAttempts + 1, identityPromotion);
     }
 
     public boolean canRetry() {
