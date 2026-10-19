@@ -80,13 +80,7 @@ import net.coreprotect.utility.EntitySpawnTracking;
 
 public final class EntityDeathListener extends Queue implements Listener {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private List<UUID> stackedMobs = new ArrayList<>(); // A list of mobs that were stacked before getting killed so we DON'T log them
-=======
-=======
-    private List<UUID> stackedMobs = new ArrayList<>(); // A list of mobs that were stacked before getting killed so we DON'T log them
->>>>>>> origin/jh-master
     private static final int ENTITY_KILL_DUPLICATE_THRESHOLD = 256;
     private static final int ENTITY_KILL_DUPLICATE_WINDOW_SECONDS = 900;
     private static final MemoryKey<?>[] VILLAGER_MEMORY_KEYS = {
@@ -96,10 +90,6 @@ public final class EntityDeathListener extends Queue implements Listener {
         MemoryKey.MEETING_POINT,
         MemoryKey.LAST_WORKED_AT_POI
     };
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
 
     public static void parseEntityKills(String message) {
         message = message.trim().toLowerCase(Locale.ROOT);
@@ -649,10 +639,6 @@ public final class EntityDeathListener extends Queue implements Listener {
             return;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/jh-master
         if (!Config.getConfig(entity.getWorld()).ENTITY_KILLS) return;
 
         // We need to check if the mob was stacked because it will never be currently stacked now as the
@@ -660,19 +646,11 @@ public final class EntityDeathListener extends Queue implements Listener {
         if (stackedMobs.contains(entity.getUniqueId())) {
             stackedMobs.remove(entity.getUniqueId());
             return;
-<<<<<<< HEAD
-=======
-        if (EntitySpawnTracking.isTracked(entity)) {
-            Queue.queueEntitySpawnRemoved(entity.getUniqueId(), entity.getLocation());
-            EntitySpawnTracking.forget(entity.getUniqueId());
->>>>>>> master
-=======
         }
 
         if (EntitySpawnTracking.isTracked(entity)) {
             Queue.queueEntitySpawnRemoved(entity.getUniqueId(), entity.getLocation());
             EntitySpawnTracking.forget(entity.getUniqueId());
->>>>>>> origin/jh-master
         }
 
         logEntityDeath(entity, null);

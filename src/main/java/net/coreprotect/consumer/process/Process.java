@@ -141,12 +141,6 @@ public class Process {
                 return;
             }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            Database.beginTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
-=======
-=======
->>>>>>> origin/jh-master
             boolean hasEntitySpawnLogs = false;
             boolean hasEntitySpawnUpdates = false;
             boolean hasEntityKills = false;
@@ -197,10 +191,6 @@ public class Process {
                 deferConsumerRetry();
                 return;
             }
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
             // Scan through usernames, ensure everything is loaded in memory.
             for (Entry<Integer, String[]> entry : users.entrySet()) {
                 String[] data = entry.getValue();
@@ -213,12 +203,6 @@ public class Process {
                 }
             }
             updateLockTable(statement, (lastRun ? 0 : 1));
-<<<<<<< HEAD
-<<<<<<< HEAD
-            Database.commitTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
-=======
-=======
->>>>>>> origin/jh-master
             if (!Database.commitTransactionChecked(statement, Config.getGlobal().MYSQL)) {
                 Database.rollbackTransaction(statement, Config.getGlobal().MYSQL);
                 invalidateUserCaches(users);
@@ -231,10 +215,6 @@ public class Process {
                 Map<Integer, EntitySpawnIdentity> identitiesByRowId = EntitySpawnStatement.loadIdentitiesByRowIds(connection, entityIdentityRowIds);
                 bindPendingEntitySpawnIdentities(consumerData, consumerObject, entitySpawnIdentities, identitiesByRowId);
             }
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
 
             // Create prepared statements
             PreparedStatement preparedStmtSigns = Database.prepareStatement(connection, Database.SIGN, false);
@@ -261,22 +241,12 @@ public class Process {
             entitySpawnUpdates = hasEntitySpawnUpdates ? new EntitySpawnStatement.Updates(connection) : null;
 
             // Scan through consumer data
-<<<<<<< HEAD
-<<<<<<< HEAD
-            Database.beginTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
-=======
-=======
->>>>>>> origin/jh-master
             if (!beginConsumerTransaction(statement)) {
                 deferConsumerRetry();
                 return;
             }
             int processedThrough = 0;
             processingStarted = true;
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
             for (int i = 0; i < consumerDataSize; i++) {
                 Object[] data = consumerData.get(i);
                 if (data != null) {
@@ -474,21 +444,11 @@ public class Process {
                                 completeEntitySpawnLogs(pendingEntitySpawnLogs, committed);
                                 processedThrough = i + 1;
                                 Thread.sleep(500);
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                Database.beginTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
-=======
-=======
->>>>>>> origin/jh-master
                                 if (!beginConsumerTransaction(statement)) {
                                     discardProcessedConsumerData(processId, consumerData, users, consumerObject, processedThrough);
                                     deferConsumerRetry();
                                     return;
                                 }
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
                             }
                         }
                         catch (Exception e) {
@@ -793,12 +753,6 @@ public class Process {
             preparedStmtArt.executeBatch();
             preparedStmtEntity.executeBatch();
             preparedStmtBlockdata.executeBatch();
-<<<<<<< HEAD
-<<<<<<< HEAD
-            Database.commitTransaction(statement, net.coreprotect.config.Config.getGlobal().MYSQL);
-=======
-=======
->>>>>>> origin/jh-master
             if (preparedStmtEntityKillLinks != null) {
                 preparedStmtEntityKillLinks.executeBatch();
             }
@@ -807,10 +761,6 @@ public class Process {
                 Database.rollbackTransaction(statement, Config.getGlobal().MYSQL);
             }
             return committed;
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
         }
         catch (Exception e) {
             Database.rollbackTransaction(statement, Config.getGlobal().MYSQL);

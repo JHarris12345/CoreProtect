@@ -42,10 +42,6 @@ public class ParseResult implements CoreProtectResult {
             }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/jh-master
         String result = "unknown";
         if (actionID == 0) {
             result = "break";
@@ -64,12 +60,6 @@ public class ParseResult implements CoreProtectResult {
         }
 
         return result;
-<<<<<<< HEAD
-=======
-        return LookupActions.getActionString(actionID);
->>>>>>> master
-=======
->>>>>>> origin/jh-master
     }
 
     @Deprecated

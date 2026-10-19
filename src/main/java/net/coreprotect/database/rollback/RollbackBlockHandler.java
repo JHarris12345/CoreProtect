@@ -561,22 +561,6 @@ public class RollbackBlockHandler extends Queue {
      * @param user
      *            The user performing the rollback
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public static void applyBlockChanges(Map<Block, BlockData> chunkChanges, int preview, Player user) {
-        for (Entry<Block, BlockData> chunkChange : chunkChanges.entrySet()) {
-            Block changeBlock = chunkChange.getKey(); // From block (pre rollback)
-            BlockData changeBlockData = chunkChange.getValue(); // To block (post rollback)
-
-            if (preview > 0 && user != null) {
-                Util.sendBlockChange(user, changeBlock.getLocation(), changeBlockData);
-            }
-            else {
-                BlockUtils.setTypeAndData(changeBlock, null, changeBlockData, true);
-            }
-=======
-=======
->>>>>>> origin/jh-master
     public static void applyBlockChanges(Map<Block, PendingBlockChange> chunkChanges, int preview, Player user) {
         if (preview == 0 || user == null) {
             applyBlockChanges(chunkChanges, true, true);
@@ -592,10 +576,6 @@ public class RollbackBlockHandler extends Queue {
             PendingBlockChange change = chunkChange.getValue();
             BlockData changeBlockData = change.blockData();
             Util.sendBlockChange(user, changeBlock.getLocation(), changeBlockData);
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> origin/jh-master
         }
         chunkChanges.clear();
     }

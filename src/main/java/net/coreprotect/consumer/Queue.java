@@ -222,18 +222,7 @@ public class Queue {
             }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        int currentConsumer = Consumer.currentConsumer;
-        int consumerId = Consumer.newConsumerId(currentConsumer);
-        addConsumer(currentConsumer, new Object[] { consumerId, Process.BLOCK_BREAK, type, extraData, breakType, 0, blockNumber, blockData, spawnerStack });
-        queueStandardData(consumerId, currentConsumer, new String[] { user, null }, block);
-=======
-        queueStandardData(new Object[] { null, Process.BLOCK_BREAK, type, extraData, breakType, 0, blockNumber, blockData }, new String[] { user, null }, block, false, Consumer.reserveConsumer());
->>>>>>> master
-=======
         queueStandardData(new Object[] { null, Process.BLOCK_BREAK, type, extraData, breakType, 0, blockNumber, blockData, spawnerStack }, new String[] { user, null }, block, false, Consumer.reserveConsumer());
->>>>>>> origin/jh-master
     }
 
     protected static void queueBlockPlace(String user, BlockState blockLocation, Material blockType, BlockState blockReplaced, Material forceType, int forceD, int forceData, String blockData) {

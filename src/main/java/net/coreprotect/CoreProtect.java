@@ -17,18 +17,9 @@ import net.coreprotect.utility.Chat;
 public final class CoreProtect extends JavaPlugin {
 
     private static CoreProtect instance;
-<<<<<<< HEAD
-<<<<<<< HEAD
     private boolean advancedChestsEnabled = false;
     public static boolean isSkyblock; // If this is true, we won't log ore block breaks
 
-=======
->>>>>>> master
-=======
-    private boolean advancedChestsEnabled = false;
-    public static boolean isSkyblock; // If this is true, we won't log ore block breaks
-
->>>>>>> origin/jh-master
     /**
      * Get the instance of CoreProtect
      *

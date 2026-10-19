@@ -1,17 +1,8 @@
 package net.coreprotect.listener.block;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-=======
->>>>>>> master
-=======
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
->>>>>>> origin/jh-master
 import java.util.Locale;
 
 import net.coreprotect.CoreProtect;
