@@ -104,7 +104,8 @@ public class CoreProtectAPI extends Queue {
     }
 
     private static boolean isSupportedLegacyAction(Integer action) {
-        return action != null && (action == LookupActions.BLOCK_BREAK || action == LookupActions.BLOCK_PLACE || action == LookupActions.INTERACTION || action == LookupActions.ENTITY_KILL || action == LookupActions.ENTITY_SPAWN);
+        // Fork: also allow CHAT (6) so performLookup can return chat rows (InsanityChat /chatlog relies on this)
+        return action != null && (action == LookupActions.BLOCK_BREAK || action == LookupActions.BLOCK_PLACE || action == LookupActions.INTERACTION || action == LookupActions.ENTITY_KILL || action == LookupActions.ENTITY_SPAWN || action == LookupActions.CHAT);
     }
 
     /**
